@@ -11,6 +11,8 @@ import (
 	dhcpConn "github.com/krolaw/dhcp4/conn"
 )
 
+const infiniteLease = 999 * 24 * time.Hour
+
 func main() {
 	clientMAC, _ := net.ParseMAC(os.Args[1])
 	clientIP, clientIPNet, _ := net.ParseCIDR(os.Args[2])
@@ -35,7 +37,7 @@ func SingleClientDHCPServer(
 		clientIP:      clientIP,
 		clientMAC:     clientMAC,
 		serverIP:      serverIP,
-		leaseDuration: 999 * 24 * time.Hour,
+		leaseDuration: infiniteLease,
 		options: dhcp.Options{
 			dhcp.OptionSubnetMask:       []byte(clientMask),
 			dhcp.OptionRouter:           []byte(routerIP),
