@@ -13,7 +13,7 @@ go build scdhcpd.go
 ## Usage
 
 ```shell
-./main \
+./scdhcpd \
   CLIENT_MAC \
   CLIENT_IP \
   SERVER_IFACE \
