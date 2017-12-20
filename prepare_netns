@@ -1,0 +1,17 @@
+ip netns del scdhcpd-client
+ip netns del scdhcpd-server
+
+ip netns add scdhcpd-server
+ip netns add scdhcpd-client
+
+ip link add veth_client type veth peer name veth_server
+ip link set veth_client netns scdhcpd-client
+ip link set veth_server netns scdhcpd-server
+
+ip netns exec scdhcpd-client ip link set up lo
+ip netns exec scdhcpd-client ip link set up veth_client
+ip netns exec scdhcpd-client ip link set address C4:4D:71:8D:AF:F8 dev veth_client
+
+ip netns exec scdhcpd-server ip link set up lo
+ip netns exec scdhcpd-server ip link set up veth_server
+ip netns exec scdhcpd-server ip address add 10.0.0.1/24 dev veth_server
