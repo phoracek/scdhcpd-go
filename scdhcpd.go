@@ -82,7 +82,7 @@ func (h *DHCPHandler) ServeDHCP(p dhcp.Packet, msgType dhcp.MessageType, options
 			h.options.SelectOrderOrAll(options[dhcp.OptionParameterRequestList]))
 
 	default:
-		return nil
+		return nil // Ignored message type
 	}
 }
 
