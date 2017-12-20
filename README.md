@@ -31,7 +31,15 @@ This will probably break your connectivity. Run as root.
 ./prepare_netns
 
 # run dhcp server on background
-ip netns exec scdhcpd-server ./scdhcpd C4:4D:71:8D:AF:F8 192.168.1.2/24 veth_server 10.0.0.1 192.168.1.1 8.8.8.8 &
+ip netns exec scdhcpd-server \
+  ./scdhcpd \
+    C4:4D:71:8D:AF:F8 \
+    192.168.1.2/24 \
+    veth_server \
+    10.0.0.1 \
+    192.168.1.1 \
+    8.8.8.8 \
+    &
 
 # run dhcp client
 ip netns exec scdhcpd-client dhclient veth_client
