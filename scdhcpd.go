@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"log"
 	"net"
 	"os"
 	"time"
@@ -14,8 +13,10 @@ import (
 const infiniteLease = 999 * 24 * time.Hour
 
 func main() {
-	clientMAC, _ := net.ParseMAC(os.Args[1])
-	clientIP, clientIPNet, _ := net.ParseCIDR(os.Args[2])
+	clientMAC, err := net.ParseMAC(os.Args[1])
+	CheckError(err)
+	clientIP, clientIPNet, err := net.ParseCIDR(os.Args[2])
+	CheckError(err)
 	clientMask := clientIPNet.Mask
 	serverIface := os.Args[3]
 	serverIP := net.ParseIP(os.Args[4])
@@ -46,11 +47,10 @@ func SingleClientDHCPServer(
 	}
 
 	l, err := dhcpConn.NewUDP4BoundListener(serverIface, ":67")
-	if err != nil {
-		return
-	}
+	CheckError(err)
 	defer l.Close()
-	log.Fatal(dhcp.Serve(l, handler))
+	err = dhcp.Serve(l, handler)
+	CheckError(err)
 }
 
 type DHCPHandler struct {
@@ -83,5 +83,11 @@ func (h *DHCPHandler) ServeDHCP(p dhcp.Packet, msgType dhcp.MessageType, options
 
 	default:
 		return nil
+	}
+}
+
+func CheckError(err error) {
+	if err != nil {
+		panic(err)
 	}
 }
