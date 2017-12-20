@@ -38,8 +38,8 @@ func SingleClientDHCPServer(
 		leaseDuration: 999 * 24 * time.Hour,
 		options: dhcp.Options{
 			dhcp.OptionSubnetMask:       []byte(clientMask),
-			dhcp.OptionRouter:           []byte(routerIP), // Presuming Server is also your router
-			dhcp.OptionDomainNameServer: []byte(dnsIP),    // Presuming Server is also your DNS server
+			dhcp.OptionRouter:           []byte(routerIP),
+			dhcp.OptionDomainNameServer: []byte(dnsIP),
 		},
 	}
 
@@ -74,7 +74,7 @@ func (h *DHCPHandler) ServeDHCP(p dhcp.Packet, msgType dhcp.MessageType, options
 			return nil // Is not our client
 		}
 		if server, ok := options[dhcp.OptionServerIdentifier]; ok && !net.IP(server).Equal(h.serverIP) {
-			return nil // Message not for this dhcp server
+			return nil // Message not for this DHCP server
 		}
 		return dhcp.ReplyPacket(p, dhcp.ACK, h.serverIP, h.clientIP, h.leaseDuration,
 			h.options.SelectOrderOrAll(options[dhcp.OptionParameterRequestList]))
