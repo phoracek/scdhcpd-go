@@ -22,7 +22,17 @@ func main() {
 	serverIP := net.ParseIP(os.Args[4])
 	routerIP := net.ParseIP(os.Args[5])
 	dnsIP := net.ParseIP(os.Args[6])
-	SingleClientDHCPServer(clientMAC, clientIP, clientMask, serverIface, serverIP, routerIP, dnsIP)
+
+	err = SingleClientDHCPServer(
+		clientMAC,
+		clientIP,
+		clientMask,
+		serverIface,
+		serverIP,
+		routerIP,
+		dnsIP,
+	)
+	CheckError(err)
 }
 
 func SingleClientDHCPServer(
@@ -32,7 +42,7 @@ func SingleClientDHCPServer(
 	serverIface string,
 	serverIP net.IP,
 	routerIP net.IP,
-	dnsIP net.IP) {
+	dnsIP net.IP) error {
 
 	handler := &DHCPHandler{
 		clientIP:      clientIP,
@@ -47,10 +57,15 @@ func SingleClientDHCPServer(
 	}
 
 	l, err := dhcpConn.NewUDP4BoundListener(serverIface, ":67")
-	CheckError(err)
+	if err != nil {
+		return err
+	}
 	defer l.Close()
 	err = dhcp.Serve(l, handler)
-	CheckError(err)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type DHCPHandler struct {
