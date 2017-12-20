@@ -77,27 +77,23 @@ type DHCPHandler struct {
 }
 
 func (h *DHCPHandler) ServeDHCP(p dhcp.Packet, msgType dhcp.MessageType, options dhcp.Options) (d dhcp.Packet) {
+	if mac := p.CHAddr(); !bytes.Equal(mac, h.clientMAC) {
+		return nil // Is not our client
+	}
+
 	switch msgType {
 
 	case dhcp.Discover:
-		if mac := p.CHAddr(); !bytes.Equal(mac, h.clientMAC) {
-			return nil // Is not our client
-		}
 		return dhcp.ReplyPacket(p, dhcp.Offer, h.serverIP, h.clientIP, h.leaseDuration,
 			h.options.SelectOrderOrAll(options[dhcp.OptionParameterRequestList]))
 
 	case dhcp.Request:
-		if mac := p.CHAddr(); !bytes.Equal(mac, h.clientMAC) {
-			return nil // Is not our client
-		}
-		if server, ok := options[dhcp.OptionServerIdentifier]; ok && !net.IP(server).Equal(h.serverIP) {
-			return nil // Message is not for this DHCP server
-		}
 		return dhcp.ReplyPacket(p, dhcp.ACK, h.serverIP, h.clientIP, h.leaseDuration,
 			h.options.SelectOrderOrAll(options[dhcp.OptionParameterRequestList]))
 
 	default:
 		return nil // Ignored message type
+
 	}
 }
 
